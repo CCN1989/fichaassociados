@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de Cadastro | Associados</title>
+<style>
+:root{
+  --fundo:#FFF3E4; --papel:#FFFBF6; --laranja:#F6A85B; --laranja-escuro:#D9792B;
+  --laranja-claro:#FFE0BD; --texto:#4A2C12; --suave:#8A6A4D; --borda:#F0CFA6; --erro:#B3261E;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--texto);font:16px/1.5 Georgia,"Times New Roman",serif;padding:24px 14px 60px}
+.ficha{max-width:820px;margin:0 auto;background:var(--papel);border:1px solid var(--borda);border-radius:14px;overflow:hidden}
+header{display:flex;align-items:center;gap:20px;flex-wrap:wrap;background:var(--laranja-claro);padding:20px 28px;border-bottom:4px solid var(--laranja)}
+h1{margin:0;font-size:1.6rem}
+.logo{height:76px;width:auto;max-width:100%}
+header p{margin:4px 0 0;color:var(--suave);font-size:.95rem}
+form{padding:8px 28px 28px}
+fieldset{border:0;border-top:1px solid var(--borda);margin:22px 0 0;padding:16px 0 0}
+fieldset:first-of-type{border-top:0}
+legend{font-size:1.15rem;font-weight:bold;color:var(--laranja-escuro);padding-right:10px}
+.grade{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}
+label{display:block;font:600 .88rem system-ui,sans-serif;margin-bottom:4px}
+input,select{width:100%;padding:10px 11px;border:1px solid var(--borda);border-radius:8px;background:#fff;color:var(--texto);font:1rem system-ui,sans-serif}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--laranja);outline-offset:1px}
+input[type=file]{padding:7px;font-size:.9rem}
+.dica{font:.8rem system-ui,sans-serif;color:var(--suave);margin-top:3px}
+.erro{font:.82rem system-ui,sans-serif;color:var(--erro);margin-top:3px;min-height:0}
+input.invalido,select.invalido{border-color:var(--erro)}
+.foto{display:flex;align-items:center;gap:14px}
+.moldura{width:90px;height:120px;border:2px dashed var(--laranja);border-radius:6px;background:var(--laranja-claro) center/cover no-repeat;flex:none;display:grid;place-items:center;font:.75rem system-ui,sans-serif;color:var(--suave);text-align:center}
+.doc{display:grid;grid-template-columns:84px 1fr;gap:8px}
+.dep{background:#fff;border:1px solid var(--borda);border-left:5px solid var(--laranja);border-radius:10px;padding:16px;margin-top:14px}
+.dep-topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.dep-topo strong{color:var(--laranja-escuro)}
+button{font:600 1rem system-ui,sans-serif;border:0;border-radius:8px;padding:11px 20px;cursor:pointer}
+.primario{background:var(--laranja-escuro);color:#fff}
+.primario:hover{background:#C26A22}
+.secundario{background:var(--laranja-claro);color:var(--texto);border:1px solid var(--laranja)}
+.remover{background:none;color:var(--erro);padding:4px 8px;text-decoration:underline}
+button:disabled{opacity:.5;cursor:not-allowed}
+.acoes{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+#msg{margin-top:14px;font:600 .95rem system-ui,sans-serif}
+.ok{color:#2E6B2E}
+#cod-print{margin-top:8px;font:700 .95rem system-ui,sans-serif;color:var(--laranja-escuro)}
+#cod-print:empty{display:none}
+.cod{font:600 .85rem system-ui,sans-serif;color:var(--suave);margin-left:8px}
+.modal{position:fixed;inset:0;background:rgba(74,44,18,.55);display:grid;place-items:center;padding:16px;z-index:50}
+.modal[hidden]{display:none}
+.caixa{background:var(--papel);border-radius:14px;padding:28px 26px;max-width:420px;width:100%;text-align:center;border-top:6px solid var(--laranja);font-family:system-ui,sans-serif}
+.caixa h2{margin:14px 0 6px;font:700 1.25rem Georgia,"Times New Roman",serif}
+.caixa p{margin:0;color:var(--suave)}
+.spinner{width:46px;height:46px;border:5px solid var(--laranja-claro);border-top-color:var(--laranja-escuro);border-radius:50%;margin:0 auto;animation:gira .9s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.etapas{list-style:none;padding:0;margin:14px 0 0;display:inline-block;text-align:left}
+.etapas li{padding:4px 0 4px 28px;position:relative;color:var(--suave)}
+.etapas li::before{content:"\25CB";position:absolute;left:4px}
+.etapas li.ativo{color:var(--texto);font-weight:600}
+.etapas li.ativo::before{content:"";width:11px;height:11px;border:2px solid var(--laranja-escuro);border-top-color:transparent;border-radius:50%;left:5px;top:10px;animation:gira .8s linear infinite}
+.etapas li.feito{color:#2E6B2E}
+.etapas li.feito::before{content:"\2713";font-weight:bold}
+.check{width:56px;height:56px;border-radius:50%;background:#DFF1DA;color:#2E6B2E;font-size:1.9rem;display:grid;place-items:center;margin:0 auto}
+.erro-icone{background:#FBE3E0;color:var(--erro)}
+.cod-linha{display:flex;justify-content:space-between;gap:12px;background:var(--laranja-claro);border-radius:8px;padding:8px 12px;margin-top:8px;text-align:left;font-size:.92rem}
+.pergunta{font-weight:700;color:var(--texto)!important;margin:20px 0 10px!important}
+.caixa .acoes{justify-content:center;margin-top:6px}
+@media(max-width:640px){.grade{grid-template-columns:1fr 1fr}.c2,.c3{grid-column:span 1}.c4,.c6{grid-column:span 2}form{padding:8px 16px 22px}}
+@media print{
+  body{background:#fff;padding:0}.ficha{border:0}
+  .modal,.acoes,#btnDep,.remover,#msg,input[type=file],.dica{display:none!important}
+  input,select{border:0;border-bottom:1px solid #999;border-radius:0;padding:4px 0;background:none;appearance:none}
+  .dep{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="ficha">
+  <header>
+    <img class="logo" src="https://raw.githubusercontent.com/CCN1989/Imagens/refs/heads/main/Logo_Oficial%2Blema.png" alt="Logo" onerror="this.remove()">
+    <div>
+      <h1>Ficha de Cadastro | Associados</h1>
+      <p>Preencha os dados do titular e, se houver, dos dependentes.</p>
+      <div id="cod-print"></div>
+    </div>
+  </header>
+
+  <form id="form" novalidate>
+    <fieldset>
+      <legend>Dados do titular</legend>
+      <div class="grade">
+        <div class="c6"><label for="nome">Nome do titular ou responsável (somente maior de idade)</label><input id="nome" required autocomplete="name"></div>
+        <div class="c2"><label for="nasc">Data de nascimento</label><input id="nasc" type="date" required><div class="erro" id="e-nasc"></div></div>
+        <div class="c4"><label for="cpf">Documento</label>
+          <div class="doc"><select id="tipoDoc" aria-label="Tipo de documento"><option>CPF</option><option>RG</option></select>
+          <input id="cpf" required></div><div class="erro" id="e-cpf"></div></div>
+        <div class="c4"><label for="rua">Rua</label><input id="rua" required autocomplete="address-line1"></div>
+        <div class="c2"><label for="nr">Nº</label><input id="nr" required></div>
+        <div class="c3"><label for="bairro">Bairro</label><input id="bairro" required></div>
+        <div class="c3"><label for="cidade">Cidade</label><input id="cidade" required></div>
+        <div class="c2"><label for="cep">CEP</label><input id="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" required></div>
+        <div class="c4"><label for="email">E-mail</label><input id="email" type="email" required autocomplete="email"></div>
+        <div class="c3"><label for="whats">WhatsApp</label><input id="whats" type="tel" inputmode="numeric" maxlength="15" placeholder="(51) 90000-0000" required></div>
+        <div class="c3">
+          <label for="invernada">O titular participará de invernada artística?</label>
+          <select id="invernada" required>
+            <option value="">Selecione</option><option>Não</option><option>Adulta</option><option>Veterana</option><option>Xirú</option>
+          </select>
+        </div>
+        <div class="c6">
+          <label>Foto 3x4 do titular (opcional)</label>
+          <div class="foto">
+            <div class="moldura" id="prev-titular">3x4</div>
+            <input type="file" accept="image/*" data-foto="prev-titular" id="foto-titular">
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Dependentes</legend>
+      <div class="dica" style="font-size:.9rem">Até 3 dependentes, sendo no máximo 1 cônjuge.</div>
+      <div id="lista"></div>
+      <div class="acoes" style="margin-top:16px"><button type="button" class="secundario" id="btnDep">+ Acrescentar dependente</button></div>
+    </fieldset>
+
+    <div class="acoes">
+      <button type="submit" class="primario" id="btnEnviar">Enviar ficha</button>
+      <button type="button" class="secundario" id="btnPrint">Imprimir / salvar em PDF</button>
+    </div>
+    <div id="msg" role="status"></div>
+  </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<div class="modal" id="modal" hidden role="alertdialog" aria-modal="true" aria-live="polite">
+  <div class="caixa">
+    <div id="m-envio">
+      <div class="spinner"></div>
+      <h2>Enviando a ficha…</h2>
+      <p>Aguarde, não feche esta página.</p>
+      <ul class="etapas" id="etapas">
+        <li>Conferindo os dados</li><li>Preparando fotos e documentos</li><li>Gravando na planilha</li>
+      </ul>
+    </div>
+    <div id="m-ok" hidden>
+      <div class="check">&#10003;</div>
+      <h2 id="m-titulo-ok">Ficha gravada com sucesso!</h2>
+      <div id="m-codigos"></div>
+      <p class="pergunta">Deseja salvar em PDF?</p>
+      <div class="acoes"><button type="button" class="primario" id="pdfSim">Sim</button><button type="button" class="secundario" id="pdfNao">Não</button></div>
+    </div>
+    <div id="m-erro" hidden>
+      <div class="check erro-icone">!</div>
+      <h2>Não foi possível enviar</h2>
+      <p>Verifique a conexão e tente novamente. Seus dados continuam preenchidos.</p>
+      <div class="acoes" style="margin-top:16px"><button type="button" class="primario" id="erroFechar">Fechar</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== CONFIGURAÇÃO ======
+   Para receber as fichas, cole abaixo a URL do seu Google Apps Script (Web App).
+   Se deixar vazio, o botão "Enviar ficha" apenas confere os dados e oferece o PDF. */
+const URL_ENVIO = "https://script.google.com/macros/s/AKfycbyZNsypBcBgyEoteTLHMaYd_2Wpgo6rDtY_kpW7T6sWJKJoJQ7HTdpXI4Y6Aue4SQnECw/exec";
+const MAX_DEP = 3;
+const INV_CONJUGE = ["Não", "Adulta", "Veterana", "Xirú"];
+const INV_FILHO = ["Não", "Mirim", "Juvenil"];
+
+const $ = s => document.querySelector(s);
+const lista = $("#lista");
+
+/* ----- máscaras ----- */
+const so = v => v.replace(/\D/g, "");
+const mCPF = v => so(v).slice(0,11).replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+const mCEP = v => so(v).slice(0,8).replace(/(\d{5})(\d)/,"$1-$2");
+const mTel = v => so(v).slice(0,11).replace(/(\d{2})(\d)/,"($1) $2").replace(/(\d{5})(\d{1,4})$/,"$1-$2");
+function mascara(el, fn){ el.addEventListener("input", () => el.value = fn(el.value)); }
+function ligaDoc(sel, inp){
+  const aplica = () => {
+    const cpf = sel.value === "CPF";
+    inp.placeholder = cpf ? "000.000.000-00" : "Número do RG";
+    inp.maxLength = cpf ? 14 : 20;
+    inp.inputMode = cpf ? "numeric" : "text";
+    inp.value = cpf ? mCPF(inp.value) : inp.value.toUpperCase();
+  };
+  sel.addEventListener("change", () => {
+    inp.value = ""; inp.classList.remove("invalido");
+    const er = inp.closest(".doc").nextElementSibling; if (er) er.textContent = "";
+    aplica();
+  });
+  inp.addEventListener("input", () => {
+    inp.value = sel.value === "CPF" ? mCPF(inp.value) : inp.value.toUpperCase().replace(/[^0-9A-Z.\-\/ ]/g, "");
+  });
+  aplica();
+}
+ligaDoc($("#tipoDoc"), $("#cpf")); mascara($("#cep"), mCEP); mascara($("#whats"), mTel);
+
+/* ----- validações ----- */
+function cpfValido(c){
+  c = so(c);
+  if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
+  for (let t = 9; t < 11; t++){
+    let s = 0;
+    for (let i = 0; i < t; i++) s += c[i] * (t + 1 - i);
+    if (((s * 10) % 11) % 10 != c[t]) return false;
+  }
+  return true;
+}
+function idade(d){
+  const n = new Date(d), h = new Date();
+  let a = h.getFullYear() - n.getFullYear();
+  if (h < new Date(h.getFullYear(), n.getMonth(), n.getDate())) a--;
+  return a;
+}
+function marca(el, msgEl, texto){
+  el.classList.toggle("invalido", !!texto);
+  if (msgEl) msgEl.textContent = texto || "";
+  return !texto;
+}
+
+/* ----- pré-visualização da foto (reduzida para ficar leve) ----- */
+function lerImagem(file, max = 600){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const k = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = img.width * k; c.height = img.height * k;
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        res(c.toDataURL("image/jpeg", .8));
+      };
+      img.onerror = rej; img.src = r.result;
+    };
+    r.onerror = rej; r.readAsDataURL(file);
+  });
+}
+document.addEventListener("change", async e => {
+  const id = e.target.dataset && e.target.dataset.foto;
+  if (!id || !e.target.files[0]) return;
+  const box = document.getElementById(id);
+  const url = await lerImagem(e.target.files[0]);
+  box.style.backgroundImage = `url(${url})`; box.textContent = ""; box.dataset.img = url;
+});
+
+/* ----- dependentes ----- */
+let seq = 0;
+function atualizaBotao(){
+  $("#btnDep").disabled = lista.children.length >= MAX_DEP;
+  const temConjuge = [...lista.querySelectorAll(".tipo")].some(s => s.value === "Cônjuge");
+  lista.querySelectorAll(".tipo").forEach(s => {
+    const op = [...s.options].find(o => o.value === "Cônjuge");
+    op.disabled = temConjuge && s.value !== "Cônjuge";
+  });
+  [...lista.children].forEach((d, i) => d.querySelector("strong").textContent = "Dependente " + (i + 1));
+}
+$("#btnDep").addEventListener("click", () => {
+  if (lista.children.length >= MAX_DEP) return;
+  const n = ++seq;
+  const d = document.createElement("div");
+  d.className = "dep";
+  d.innerHTML = `
+    <div class="dep-topo"><span><strong></strong><span class="cod"></span></span><button type="button" class="remover">Remover</button></div>
+    <div class="grade">
+      <div class="c2"><label>Parentesco</label>
+        <select class="tipo" required>
+          <option value="">Selecione</option><option>Cônjuge</option><option>Filho(a)</option><option>Enteado(a)</option>
+        </select></div>
+      <div class="c4"><label>Nome</label><input class="d-nome" required></div>
+      <div class="c2"><label>Data de nascimento</label><input class="d-nasc" type="date" required></div>
+      <div class="c4"><label>Documento</label>
+        <div class="doc"><select class="d-tipodoc" aria-label="Tipo de documento"><option>CPF</option><option>RG</option></select>
+        <input class="d-cpf" required></div><div class="erro"></div></div>
+      <div class="c6"><label>Participará de invernada artística?</label>
+        <select class="d-inv" required><option value="">Escolha o parentesco primeiro</option></select></div>
+      <div class="c6 comprov" hidden>
+        <label>Comprovante (união estável ou certidão de casamento)</label>
+        <input type="file" class="d-comprov" accept="image/*,application/pdf">
+        <div class="dica">Anexe foto ou PDF do documento.</div>
+      </div>
+      <div class="c6"><label>Foto 3x4 (opcional)</label>
+        <div class="foto"><div class="moldura" id="prev-d${n}">3x4</div>
+        <input type="file" accept="image/*" data-foto="prev-d${n}"></div></div>
+    </div>`;
+  lista.appendChild(d);
+  ligaDoc(d.querySelector(".d-tipodoc"), d.querySelector(".d-cpf"));
+  d.querySelector(".tipo").addEventListener("change", e => {
+    const tipo = e.target.value;
+    d.querySelector(".comprov").hidden = tipo !== "Cônjuge";
+    const inv = d.querySelector(".d-inv"), antes = inv.value;
+    const ops = tipo === "Cônjuge" ? INV_CONJUGE : tipo ? INV_FILHO : [];
+    inv.innerHTML = '<option value="">' + (tipo ? "Selecione" : "Escolha o parentesco primeiro") + "</option>" +
+      ops.map(o => `<option>${o}</option>`).join("");
+    if (ops.includes(antes)) inv.value = antes;
+    atualizaBotao();
+  });
+  d.querySelector(".remover").addEventListener("click", () => { d.remove(); atualizaBotao(); });
+  atualizaBotao();
+  d.querySelector(".tipo").focus();
+});
+
+/* ----- envio ----- */
+const arquivoBase64 = f => new Promise((res, rej) => {
+  if (!f) return res(null);
+  const r = new FileReader();
+  r.onload = () => res({ nome: f.name, tipo: f.type, dados: r.result });
+  r.onerror = rej; r.readAsDataURL(f);
+});
+
+function validar(){
+  let ok = true;
+  document.querySelectorAll("#form [required]").forEach(el => {
+    if (el.closest("[hidden]")) return;
+    ok = marca(el, null, el.value.trim() ? "" : "x") && ok;
+  });
+  const nasc = $("#nasc");
+  if (nasc.value && idade(nasc.value) < 18) ok = marca(nasc, $("#e-nasc"), "O titular deve ser maior de 18 anos.") && ok;
+  else if (nasc.value) marca(nasc, $("#e-nasc"), "");
+  if ($("#tipoDoc").value === "CPF" && $("#cpf").value && !cpfValido($("#cpf").value)) ok = marca($("#cpf"), $("#e-cpf"), "CPF inválido.") && ok;
+  else if ($("#cpf").value) marca($("#cpf"), $("#e-cpf"), "");
+  lista.querySelectorAll(".dep").forEach(d => {
+    const c = d.querySelector(".d-cpf");
+    const er = c.closest(".doc").nextElementSibling;
+    if (d.querySelector(".d-tipodoc").value === "CPF" && c.value && !cpfValido(c.value)) ok = marca(c, er, "CPF inválido.") && ok;
+    else if (c.value) marca(c, er, "");
+    if (d.querySelector(".tipo").value === "Cônjuge" && !d.querySelector(".d-comprov").files[0])
+      { ok = false; d.querySelector(".d-comprov").classList.add("invalido"); }
+    else d.querySelector(".d-comprov").classList.remove("invalido");
+  });
+  return ok;
+}
+
+const modal = $("#modal");
+const pausa = ms => new Promise(ok => setTimeout(ok, ms));
+let ultimoEnvio = "", ultimoR = null;
+
+function mostra(painel){
+  ["m-envio", "m-ok", "m-erro"].forEach(id => $("#" + id).hidden = id !== painel);
+  modal.hidden = false;
+}
+function etapas(ativa){
+  document.querySelectorAll("#etapas li").forEach((li, i) => li.className = i < ativa ? "feito" : i === ativa ? "ativo" : "");
+}
+function limparFicha(){
+  $("#form").reset(); lista.innerHTML = ""; atualizaBotao();
+  $("#tipoDoc").dispatchEvent(new Event("change"));
+  document.querySelectorAll(".moldura").forEach(m => { m.style.backgroundImage = ""; m.textContent = "3x4"; delete m.dataset.img; });
+  $("#cod-print").textContent = ""; $("#msg").textContent = "";
+  $("#btnEnviar").disabled = false;
+}
+function finalizar(titulo, r, dados){
+  $("#m-titulo-ok").textContent = titulo;
+  const box = $("#m-codigos"); box.innerHTML = "";
+  ultimoEnvio = ""; ultimoR = r;
+  $("#pdfSim").disabled = false; $("#pdfSim").textContent = "Sim";
+  if (r){
+    const add = (rotulo, cod) => {
+      const linha = document.createElement("div"); linha.className = "cod-linha";
+      const a = document.createElement("span"); a.textContent = rotulo;
+      const b = document.createElement("strong"); b.textContent = cod;
+      linha.append(a, b); box.appendChild(linha);
+    };
+    add("Titular", r.titular);
+    const deps = [...lista.querySelectorAll(".dep")];
+    r.dependentes.forEach((c, i) => {
+      add(dados.dependentes[i].parentesco + " – " + dados.dependentes[i].nome, c);
+      deps[i].querySelector(".cod").textContent = "Código: " + c;
+    });
+    $("#cod-print").textContent = "Código de registro: " + r.titular;
+    ultimoEnvio = "Código de registro do último envio: " + [r.titular, ...r.dependentes].join(", ");
+  }
+  mostra("m-ok");
+  $("#pdfSim").focus();
+}
+
+$("#form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const msg = $("#msg"); msg.className = ""; msg.style.color = "var(--erro)"; msg.textContent = "";
+  if (!validar()){ msg.textContent = "Revise os campos destacados em vermelho."; return; }
+  $("#btnEnviar").disabled = true;
+  if (!URL_ENVIO){ finalizar("Dados conferidos!", null, null); return; }
+
+  mostra("m-envio"); etapas(0);
+  try {
+    await pausa(400); etapas(1);
+    const dependentes = [];
+    for (const d of lista.querySelectorAll(".dep")){
+      dependentes.push({
+        parentesco: d.querySelector(".tipo").value,
+        nome: d.querySelector(".d-nome").value,
+        nascimento: d.querySelector(".d-nasc").value,
+        documento: d.querySelector(".d-tipodoc").value + " " + d.querySelector(".d-cpf").value,
+        invernada: d.querySelector(".d-inv").value,
+        comprovante: await arquivoBase64(d.querySelector(".d-comprov").files[0]),
+        foto: d.querySelector(".moldura").dataset.img || null
+      });
+    }
+    const dados = {
+      titular: {
+        nome: $("#nome").value, nascimento: $("#nasc").value, documento: $("#tipoDoc").value + " " + $("#cpf").value,
+        rua: $("#rua").value, numero: $("#nr").value, bairro: $("#bairro").value,
+        cidade: $("#cidade").value, cep: $("#cep").value, email: $("#email").value,
+        whatsapp: $("#whats").value, invernada: $("#invernada").value,
+        foto: $("#prev-titular").dataset.img || null
+      },
+      dependentes, enviadoEm: new Date().toISOString()
+    };
+    await pausa(300); etapas(2);
+    const resp = await fetch(URL_ENVIO, { method: "POST", headers: {"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify(dados) });
+    const r = await resp.json();
+    if (!r.ok) throw new Error(r.erro || "Falha no envio");
+    etapas(3); await pausa(500);
+    finalizar("Ficha gravada com sucesso!", r, dados);
+  } catch (err){
+    mostra("m-erro");
+    $("#btnEnviar").disabled = false;
+  }
+});
+
+/* PDF:ini */
+const dataBR = iso => { const p = (iso || "").split("-"); return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : ""; };
+function lerFicha(){
+  return {
+    titular: {
+      nome: $("#nome").value, nascimento: $("#nasc").value, documento: $("#tipoDoc").value + " " + $("#cpf").value,
+      rua: $("#rua").value, numero: $("#nr").value, bairro: $("#bairro").value, cidade: $("#cidade").value,
+      cep: $("#cep").value, email: $("#email").value, whatsapp: $("#whats").value,
+      invernada: $("#invernada").value, foto: $("#prev-titular").dataset.img || null
+    },
+    dependentes: [...lista.querySelectorAll(".dep")].map(d => ({
+      parentesco: d.querySelector(".tipo").value, nome: d.querySelector(".d-nome").value,
+      nascimento: d.querySelector(".d-nasc").value,
+      documento: d.querySelector(".d-tipodoc").value + " " + d.querySelector(".d-cpf").value,
+      invernada: d.querySelector(".d-inv").value,
+      comprovante: (d.querySelector(".d-comprov").files[0] || {}).name || "",
+      foto: d.querySelector(".moldura").dataset.img || null
+    }))
+  };
+}
+let logoPromise = null;
+function carregarLogo(){
+  if (!logoPromise) logoPromise = fetch("logo.png")
+    .then(r => { if (!r.ok) throw 0; return r.blob(); })
+    .then(b => new Promise(ok => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.readAsDataURL(b); }))
+    .catch(() => null);
+  return logoPromise;
+}
+const tamanhoImg = src => new Promise(ok => {
+  const i = new Image(); i.onload = () => ok([i.width, i.height]); i.onerror = () => ok([3, 4]); i.src = src;
+});
+async function fotoPDF(doc, src, x, y, w, h){
+  doc.setDrawColor(240, 207, 166); doc.setLineWidth(.4); doc.rect(x, y, w, h);
+  if (!src){
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(138, 106, 77);
+    doc.text("Foto 3x4", x + w / 2, y + h / 2, { align: "center" }); return;
+  }
+  const [iw, ih] = await tamanhoImg(src), k = Math.min(w / iw, h / ih), dw = iw * k, dh = ih * k;
+  doc.addImage(src, "JPEG", x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+}
+function campoPDF(doc, rotulo, valor, x, y, w){
+  doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(138, 106, 77);
+  doc.text(rotulo.toUpperCase(), x, y);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(74, 44, 18);
+  const t = String(valor || "").trim() || "-";
+  doc.text(doc.splitTextToSize(t, w - 1)[0], x, y + 5.5);
+  doc.setDrawColor(240, 207, 166); doc.setLineWidth(.3); doc.line(x, y + 7.5, x + w, y + 7.5);
+}
+function secaoPDF(doc, titulo, y){
+  doc.setFont("helvetica", "bold"); doc.setFontSize(12.5); doc.setTextColor(217, 121, 43);
+  doc.text(titulo, 15, y);
+  doc.setDrawColor(246, 168, 91); doc.setLineWidth(.5); doc.line(15, y + 2, 195, y + 2);
+}
+async function gerarPDF(f, cod){
+  const doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+  const W = 210, M = 15, t = f.titular;
+  doc.setFillColor(255, 224, 189); doc.rect(0, 0, W, 30, "F");
+  doc.setFillColor(246, 168, 91); doc.rect(0, 30, W, 1.4, "F");
+  let tx = M;
+  const logo = await carregarLogo();
+  if (logo){
+    const [lw, lh] = await tamanhoImg(logo), k = Math.min(24 / lh, 55 / lw), w = lw * k, h = lh * k;
+    doc.addImage(logo, "PNG", M, (30 - h) / 2, w, h);
+    tx = M + w + 6;
+  }
+  const maxTit = W - M - (cod ? 48 : 0) - tx;
+  doc.setTextColor(74, 44, 18); doc.setFont("helvetica", "bold");
+  let fs = 17; doc.setFontSize(fs);
+  while (fs > 10 && doc.getTextWidth("Ficha de Cadastro | Associados") > maxTit){ fs -= .5; doc.setFontSize(fs); }
+  doc.text("Ficha de Cadastro | Associados", tx, 15);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(138, 106, 77);
+  doc.text("Titular e dependentes", tx, 22);
+  if (cod){
+    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(138, 106, 77);
+    doc.text("CÓDIGO DE REGISTRO", W - M, 12, { align: "right" });
+    doc.setFontSize(17); doc.setTextColor(217, 121, 43);
+    doc.text(cod.titular, W - M, 22, { align: "right" });
+  }
+
+  secaoPDF(doc, "Dados do titular", 42);
+  let y = 50;
+  await fotoPDF(doc, t.foto, W - M - 30, y, 30, 40);
+  campoPDF(doc, "Nome", t.nome, M, y, 140);
+  campoPDF(doc, "Nascimento", dataBR(t.nascimento), M, y + 14, 40);
+  campoPDF(doc, "Documento", t.documento, M + 44, y + 14, 50);
+  campoPDF(doc, "WhatsApp", t.whatsapp, M + 98, y + 14, 42);
+  campoPDF(doc, "Rua", t.rua, M, y + 28, 96);
+  campoPDF(doc, "Nº", t.numero, M + 100, y + 28, 40);
+  campoPDF(doc, "Bairro", t.bairro, M, y + 42, 88);
+  campoPDF(doc, "Cidade", t.cidade, M + 92, y + 42, 88);
+  campoPDF(doc, "CEP", t.cep, M, y + 56, 40);
+  campoPDF(doc, "E-mail", t.email, M + 44, y + 56, 136);
+  campoPDF(doc, "Participa de invernada artística?", t.invernada, M, y + 70, 100);
+  y += 88;
+
+  if (f.dependentes.length){
+    secaoPDF(doc, "Dependentes", y); y += 8;
+    for (let i = 0; i < f.dependentes.length; i++){
+      const d = f.dependentes[i];
+      if (y + 40 > 284){ doc.addPage(); y = 20; }
+      doc.setFillColor(246, 168, 91); doc.rect(M, y, 1.6, 40, "F");
+      doc.setFont("helvetica", "bold"); doc.setFontSize(10.5); doc.setTextColor(217, 121, 43);
+      doc.text("Dependente " + (i + 1) + " - " + d.parentesco, M + 5, y + 4);
+      if (cod && cod.dependentes[i]) doc.text("Código " + cod.dependentes[i], W - M - 28, y + 4, { align: "right" });
+      await fotoPDF(doc, d.foto, W - M - 24, y + 1, 24, 32);
+      campoPDF(doc, "Nome", d.nome, M + 5, y + 10, 100);
+      campoPDF(doc, "Nascimento", dataBR(d.nascimento), M + 109, y + 10, 38);
+      campoPDF(doc, "Documento", d.documento, M + 5, y + 24, 48);
+      campoPDF(doc, "Invernada", d.invernada, M + 57, y + 24, 40);
+      if (d.parentesco === "Cônjuge") campoPDF(doc, "Comprovante anexado", d.comprovante, M + 101, y + 24, 46);
+      y += 46;
+    }
+  }
+
+  const n = doc.getNumberOfPages(), agora = new Date().toLocaleString("pt-BR");
+  for (let i = 1; i <= n; i++){
+    doc.setPage(i); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(138, 106, 77);
+    doc.text("Gerada em " + agora, M, 290); doc.text("Página " + i + " de " + n, W - M, 290, { align: "right" });
+  }
+  return doc;
+}
+/* PDF:fim */
+
+// Pergunta "Deseja salvar em PDF?" — a ficha só é limpa depois da resposta.
+$("#pdfSim").addEventListener("click", async () => {
+  const btn = $("#pdfSim"); btn.disabled = true; btn.textContent = "Gerando PDF…";
+  const msg = $("#msg");
+  try {
+    if (!window.jspdf) throw new Error("jsPDF não carregou");
+    const f = lerFicha();
+    const doc = await gerarPDF(f, ultimoR);
+    const nome = (f.titular.nome || "titular").replace(/[\\/:*?"<>|]/g, "").trim();
+    doc.save("Ficha " + (ultimoR ? ultimoR.titular + " - " : "") + nome + ".pdf");
+    modal.hidden = true; limparFicha();
+    msg.className = "ok"; msg.style.color = "";
+    msg.textContent = "PDF baixado. " + (ultimoEnvio || "");
+  } catch (err){
+    // plano B: abre a impressão do navegador (escolher "Salvar como PDF")
+    modal.hidden = true;
+    window.print();
+    limparFicha();
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+$("#pdfNao").addEventListener("click", () => {
+  modal.hidden = true; limparFicha();
+  const msg = $("#msg"); msg.className = "ok"; msg.style.color = ""; msg.textContent = ultimoEnvio || "Dados conferidos.";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+$("#erroFechar").addEventListener("click", () => modal.hidden = true);
+
+$("#btnPrint").addEventListener("click", () => window.print());
+</script>
+</body>
+</html>
